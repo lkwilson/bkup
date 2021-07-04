@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+usage() {
+  echo "$0 {restore directory}"
+}
+
+restore_dir="$1"
+
+if [ $# -ne 1 ]; then
+  echo "Error: Invalid args" >&2
+  usage >&2
+  exit 1
+fi
+
+for restore_point in "$restore_dir"/backup_*.tar; do
+  if [ -f "$restore_point" ]; then
+    basename "$restore_point"
+  fi
+done
