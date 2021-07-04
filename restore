@@ -12,6 +12,10 @@ usage() {
   echo "    Example: restore ../data_backup/"
   echo "    Example: restore data_backup/"
   echo "    Example: restore data_backup/backup_2000-12-31_00-00-00.tar"
+  echo
+  echo "    Warning: If you restore to something other than the last, then the backup script will still work. The patch will contain the effects of the restore."
+  echo
+  echo "    After restoring, backup to make it the new final restore point, or run restore again to restore to a different restore point."
 }
 
 restore_arg="$1"
