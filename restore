@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+usage() {
+  echo "$0 {restore directory or restore point}"
+  echo
+  echo "    It will restore up to the specified point or if the backup directory is given, it will restore the latest."
+  echo
+  echo "    Data is unpacked in the current directory, like tar does. You may have to remove the directory for tar to work properly."
+  echo
+  echo "    Tar will remove files not found in the restore point, so there isn't any need to remove the directory before calling restore."
+  echo
+  echo "    Example: restore ../data_backup/"
+  echo "    Example: restore data_backup/"
+  echo "    Example: restore data_backup/backup_2000-12-31_00-00-00.tar"
+}
+
+restore_arg="$1"
+
+if [ $# -ne 1 ]; then
+  echo "Error: Invalid args" >&2
+  usage >&2
+  exit 1
+elif [ ! -e "$restore_arg" ]; then
+  echo "Error: The restore argument doesn't seem to exist" >&2
+  exit 1
+fi
+
+restore_real_path="$(realpath "$restore_arg")"
+if [ -f "$restore_arg" ]; then
+  restore_tar="$(basename "$restore_real_path")"
+  restore_dir="$(dirname "$restore_real_path")"
+elif [ -d "$restore_arg" ]; then
+  restore_tar=""
+  restore_dir="$restore_real_path"
+else
+  echo "Error: Unable to detect type of the restore argument." >&2
+  exit 1
+fi
+
+restore_chain=("$restore_dir"/backup_*.tar)
+
+if [ "${#restore_chain[@]}" -eq 1 ] && [ "$restore_chain" == "$restore_dir/backup_*.tar" ]; then
+  echo "Warning: No restore points found" >&2
+  exit 2
+fi
+
+for i in "${restore_chain[@]}"; do
+  name="$(basename "$i")"
+  echo "Restoring from $name"
+  tar -xg /dev/null -f "$i"
+  if [ "$restore_tar" == "$name" ]; then
+    echo "Restore dir found"
+    break
+  fi
+done
+echo "Restore complete"

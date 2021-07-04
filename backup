@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+usage() {
+  echo "$0 {data directory} {restore directory}"
+  echo
+  echo "    The data directory is passed to tar directly, so when unpacked, it will have the same form."
+  echo
+  echo "    Example: backup data/ data_backup/"
+}
+
+data_dir="$1"
+restore_dir="$2"
+
+if [ $# -ne 2 ]; then
+  echo "Error: Invalid args" >&2
+  usage >&2
+  exit 1
+elif [ ! -d "$data_dir" ]; then
+  echo "Error: The dir to backup doesn't exist" >&2
+  exit 1
+fi
+
+mkdir -p "$restore_dir" || {
+  echo "Failed to make backup dir" >&2
+  exit 1
+}
+
+now="$(date '+%Y-%m-%d_%H-%M-%S')"
+main_restore_snar="$restore_dir/backup.snar"
+restore_tar="$restore_dir/backup_$now.tar"
+restore_snar="$restore_dir/backup_$now.snar"
+
+if [ -f "$restore_tar" ]; then
+  echo "Error: The backup file already exits. Backup is being called too frequently." >&2
+  exit 1
+fi
+
+tar -cg "$main_restore_snar" -f "$restore_tar" "$data_dir"
+cp "$main_restore_snar" "$restore_snar"
