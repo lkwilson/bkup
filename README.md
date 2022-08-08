@@ -2,6 +2,10 @@
 
 An incremental backup system written in bash.
 
+See Also: [rit](https://github.com/lkwilson/rit)
+
+It's a more sophisticated and tested incremental backup system
+
 ## How it works
 
 It creates a tar ball of the directory and then every time after that, it
